@@ -1,13 +1,21 @@
 import Router from 'koa-router';
-import noteStore from './store';
-import { broadcast } from "../utils";
+import noteStore from './store.js';
+import { broadcast } from "../utils/index.js";
 
 export const router = new Router();
 
 router.get('/', async (ctx) => {
+
   const response = ctx.response;
   const userId = ctx.state.user._id;
-  response.body = await noteStore.find({ userId });
+
+  const limit = ctx.request.headers.limit;
+  const page = ctx.request.headers.page;
+
+  console.log("page: " + page);
+  console.log("limit: " + limit);
+
+  response.body = await noteStore.find({ userId: userId, page: page, limit: limit });
   response.status = 200; // ok
 });
 
@@ -29,12 +37,14 @@ router.get('/:id', async (ctx) => {
 
 const createNote = async (ctx, note, response) => {
   try {
+    console.log(note);
     const userId = ctx.state.user._id;
     note.userId = userId;
     response.body = await noteStore.insert(note);
     response.status = 201; // created
     broadcast(userId, { type: 'created', payload: note });
   } catch (err) {
+    console.log(err);
     response.body = { message: err.message };
     response.status = 400; // bad request
   }
@@ -47,19 +57,23 @@ router.put('/:id', async (ctx) => {
   const id = ctx.params.id;
   const noteId = note._id;
   const response = ctx.response;
+
   if (noteId && noteId !== id) {
     response.body = { message: 'Param id and body _id should be the same' };
     response.status = 400; // bad request
     return;
   }
+  
   if (!noteId) {
     await createNote(ctx, note, response);
   } else {
+    const userId = ctx.state.user._id;
+    note.userId = userId;
+    console.log(note);
     const updatedCount = await noteStore.update({ _id: id }, note);
     if (updatedCount === 1) {
       response.body = note;
       response.status = 200; // ok
-      const userId = ctx.state.user._id;
       broadcast(userId, { type: 'updated', payload: note });
     } else {
       response.body = { message: 'Resource no longer exists' };

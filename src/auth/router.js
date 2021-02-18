@@ -1,7 +1,7 @@
 import Router from 'koa-router';
-import userStore from './store';
+import userStore from './store.js';
 import jwt from 'jsonwebtoken';
-import { jwtConfig } from '../utils';
+import { jwtConfig } from '../utils/index.js';
 
 export const router = new Router();
 

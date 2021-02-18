@@ -1,11 +1,19 @@
+// const Koa = require('koa');
+// const http = require('http');
+// const Router = require('koa-router');
+// const WebSocket = require('ws');
+// const bodyParser = require('koa-bodyparser');
+
+
+
 import Koa from 'koa';
 import WebSocket from 'ws';
 import http from 'http';
 import Router from 'koa-router';
 import bodyParser from "koa-bodyparser";
-import { timingLogger, exceptionHandler, jwtConfig, initWss, verifyClient } from './utils';
-import { router as noteRouter } from './note';
-import { router as authRouter } from './auth';
+import { timingLogger, exceptionHandler, jwtConfig, initWss } from './utils/index.js';
+import { router as noteRouter } from './note/index.js';
+import { router as authRouter } from './auth/index.js';
 import jwt from 'koa-jwt';
 import cors from '@koa/cors';
 

@@ -1,8 +1,8 @@
-import dataStore from 'nedb-promise';
+import dataStore from 'nedb-promises';
 
 export class UserStore {
   constructor({ filename, autoload }) {
-    this.store = dataStore({ filename, autoload });
+    this.store = new dataStore({ filename, autoload });
   }
   
   async findOne(props) {
